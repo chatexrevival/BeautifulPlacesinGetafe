@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Dashboard | Beautiful Getafe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Leaflet for Map Picker -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        /* ── Base ── */
+        .admin-container { padding: 8rem 4rem; max-width: 1200px; margin: 0 auto; color: var(--text-main); }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem; border-bottom: 1px solid var(--primary); padding-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .data-grid { display: grid; gap: 2rem; }
+        .data-card { background: var(--bg-soft); border: 1px solid var(--glass-border); padding: 2rem; border-radius: var(--radius); }
+        .data-card h4 { color: var(--primary); margin-bottom: 1rem; }
+        .data-card p { margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .section-title-sm { font-size: 2rem; margin-bottom: 2rem; color: var(--text-main); border-left: 4px solid var(--primary); padding-left: 1rem; }
+        .picker-map { height: 250px; width: 100%; border-radius: 8px; border: 1px solid var(--glass-border); margin-top: 10px; }
+
+        /* ── Nav Tabs ── */
+        .dashboard-nav { display: flex; gap: 0.75rem; margin-bottom: 3rem; background: var(--bg-soft); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--glass-border); flex-wrap: wrap; }
+        .nav-tab { position: relative; background: transparent; border: none; color: var(--text-muted); padding: 0.65rem 1.25rem; border-radius: 8px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 500; transition: all 0.2s; }
+        .nav-tab:hover { background: rgba(255,255,255,0.06); color: var(--text-main); }
+        .nav-tab.active { background: var(--primary); color: #000; font-weight: 700; }
+        .nav-tab .badge { position: absolute; top: 2px; right: 4px; background: #ef4444; color: white; font-size: 0.6rem; font-weight: 800; padding: 1px 5px; border-radius: 99px; min-width: 16px; text-align: center; }
+
+        /* ── Stats Grid ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
+        @media(max-width:900px){ .stats-grid { grid-template-columns: repeat(2,1fr); } }
+        .stat-card { background: var(--bg-soft); border: 1px solid var(--glass-border); padding: 1.75rem; border-radius: var(--radius); text-align: center; transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-card .stat-label { opacity: 0.55; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+        .stat-card .stat-value { font-size: 2.6rem; font-weight: 800; line-height: 1; }
+
+        /* ── Action Bar ── */
+        .action-bar { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem; }
+        .btn-sm { padding: 0.5rem 1.1rem; border-radius: 8px; border: none; cursor: pointer; font-size: 0.82rem; font-weight: 600; font-family: 'Inter', sans-serif; transition: all 0.2s; }
+        .btn-sm:hover { opacity: 0.85; transform: translateY(-1px); }
+        .btn-export { background: var(--primary); color: #000; }
+        .btn-import { background: transparent; border: 1px solid var(--primary) !important; color: var(--primary); }
+        .btn-danger { background: transparent; border: 1px solid #ef4444 !important; color: #ef4444; }
+        .btn-log { background: transparent; border: 1px solid var(--glass-border) !important; color: var(--text-muted); }
+
+        /* ── Inquiry Cards ── */
+        .inq-card { background: var(--bg-soft); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.25rem; }
+        .inq-card.read { opacity: 0.55; border-style: dashed; }
+        .inq-card .inq-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+        .inq-card .inq-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+        .inq-badge { font-size: 0.65rem; padding: 2px 8px; border-radius: 99px; font-weight: 700; text-transform: uppercase; }
+        .badge-unread { background: rgba(234, 179, 8, 0.2); color: #eab308; border: 1px solid #eab308; }
+        .badge-read { background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid var(--glass-border); }
+        .inq-reply-box { margin-top: 1rem; display: none; }
+        .inq-reply-box textarea { width: 100%; box-sizing: border-box; padding: 10px; background: var(--bg-white); border: 1px solid var(--glass-border); color: var(--text-main); border-radius: 8px; resize: none; font-family: 'Inter', sans-serif; font-size: 0.85rem; }
+        .inq-reply-box .reply-send-btn { margin-top: 0.5rem; background: var(--primary); color: #000; border: none; padding: 7px 16px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.8rem; }
+
+        /* ── Activity Log ── */
+        #section-log .log-entry { display: flex; gap: 1rem; align-items: flex-start; padding: 0.9rem 0; border-bottom: 1px solid var(--glass-border); }
+        #section-log .log-entry:last-child { border-bottom: none; }
+        .log-icon { font-size: 1.1rem; flex-shrink: 0; padding-top: 2px; }
+        .log-time { font-size: 0.72rem; opacity: 0.45; margin-top: 3px; }
+        .log-list { max-height: 500px; overflow-y: auto; }
+        .log-empty { opacity: 0.4; font-size: 0.9rem; text-align: center; padding: 3rem; }
+
+        /* ── Change Password Panel ── */
+        .settings-section { max-width: 420px; }
+        .settings-section input { width: 100%; box-sizing: border-box; padding: 11px 14px; background: var(--bg-white); border: 1px solid var(--glass-border); color: var(--text-main); border-radius: 8px; font-family: 'Inter', sans-serif; margin-bottom: 1rem; }
+        .settings-msg { font-size: 0.82rem; margin-top: 0.5rem; min-height: 1.2rem; }
+
+        /* ── Form inputs shared ── */
+        .admin-form-input { padding: 12px; background: var(--bg-soft); border: 1px solid var(--glass-border); color: var(--text-main); border-radius: 8px; font-family: 'Inter', sans-serif; }
+
+        /* ── Toast Notification ── */
+        #toast-container { position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.6rem; }
+        .toast { background: var(--bg-soft); border: 1px solid var(--glass-border); color: var(--text-main); padding: 0.8rem 1.4rem; border-radius: 10px; font-size: 0.88rem; font-family: 'Inter', sans-serif; box-shadow: 0 8px 30px rgba(0,0,0,0.4); animation: slideInToast 0.3s ease; max-width: 320px; }
+        .toast.toast-success { border-color: var(--primary); }
+        .toast.toast-error { border-color: #ef4444; }
+        @keyframes slideInToast { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .admin-container { padding: 6rem 1.2rem; }
+            .admin-header h1 { font-size: 2rem !important; text-align: center; }
+            .admin-header { justify-content: center; text-align: center; }
+            .admin-header .btn-primary-sm, .admin-header .btn-sm { width: 100%; }
+            .dashboard-nav { gap: 0.5rem; padding: 0.5rem; }
+            .nav-tab { padding: 0.5rem; font-size: 0.75rem; flex: 1 1 calc(50% - 0.5rem); text-align: center; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .data-grid { grid-template-columns: 1fr !important; }
+            #admin-add-place { grid-template-columns: 1fr !important; }
+            #admin-add-place > * { grid-column: span 1 !important; }
+            .data-card { padding: 1.2rem; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .nav-tab { flex: 1 1 100%; }
+            .admin-header h1 { font-size: 1.8rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- ── Login Overlay ── -->
+    <div id="admin-login-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-white); z-index: 5000; display: flex; align-items: center; justify-content: center;">
+        <div class="data-card" style="width: 370px; text-align: center; border: 1px solid var(--primary);">
+            <h2 style="margin-bottom: 0.5rem; font-family: 'Outfit';">Admin Access</h2>
+            <p style="font-size:0.8rem; opacity:0.5; margin-bottom:2rem;">Beautiful Getafe · Control Panel</p>
+            <input type="password" id="admin-pass-input" placeholder="Enter Password" onkeydown="if(event.key==='Enter') checkAdminPass()"
+                style="width: 100%; box-sizing:border-box; padding: 12px; margin-bottom: 1.5rem; background: var(--bg-soft); border: 1px solid var(--glass-border); color: var(--text-main); border-radius: 8px; text-align: center; font-family:'Inter'; font-size:1rem;">
+            <button onclick="checkAdminPass()" class="btn btn-primary" style="width: 100%;">Login</button>
+            <p id="login-error" style="color: #ef4444; font-size: 0.8rem; margin-top: 1rem; display: none;">Incorrect password. Try again.</p>
+        </div>
+    </div>
+
+    <!-- ── Admin Content ── -->
+    <div id="admin-content" style="display: none;">
+        <nav id="main-nav" class="scrolled">
+            <div class="nav-container">
+                <a href="index.html" class="logo">Beautiful<span>Getafe</span></a>
+                <div id="live-clock" class="live-clock">--:--:--</div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="destinations.html">Destinations</a></li>
+                    <li><a href="map.html">Map</a></li>
+                    <li><a href="travel-info.html">Travel Info</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="admin-container">
+
+            <!-- ── Header ── -->
+            <div class="admin-header">
+                <h1 style="font-family: 'Outfit'; font-size: 2.8rem;">Admin <span style="color: var(--primary);">Dashboard</span></h1>
+                <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                    <button onclick="switchTab('add')" class="btn btn-primary-sm" style="background: var(--accent); color: black;">+ Add New Place</button>
+                    <a href="destinations.html" class="btn btn-primary-sm">View Site</a>
+                    <button onclick="exportData()" class="btn-sm btn-export">⬇ Export</button>
+                    <label class="btn-sm btn-import" style="display:inline-block; cursor:pointer;">
+                        ⬆ Import <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
+                    </label>
+                </div>
+            </div>
+
+            <!-- ── Stats ── -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Messages</div>
+                    <div id="stat-messages" class="stat-value" style="color: var(--primary);">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Approved Places</div>
+                    <div id="stat-approved" class="stat-value" style="color: var(--accent);">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pending Review</div>
+                    <div id="stat-pending" class="stat-value" style="color: #f87171;">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Unread Messages</div>
+                    <div id="stat-unread" class="stat-value" style="color: #eab308;">0</div>
+                </div>
+            </div>
+
+            <!-- ── Nav Tabs ── -->
+            <div class="dashboard-nav">
+                <button onclick="switchTab('stats')" class="nav-tab active" id="tab-stats">📊 Overview</button>
+                <button onclick="switchTab('active')" class="nav-tab" id="tab-active">🗺 Live Places</button>
+                <button onclick="switchTab('pending')" class="nav-tab" id="tab-pending">⏳ Pending<span id="badge-pending" class="badge" style="display:none;"></span></button>
+                <button onclick="switchTab('messages')" class="nav-tab" id="tab-messages">💬 Messages<span id="badge-messages" class="badge" style="display:none;"></span></button>
+                <button onclick="switchTab('add')" class="nav-tab" id="tab-add">➕ Add Place</button>
+                <button onclick="switchTab('log')" class="nav-tab" id="tab-log">📋 Activity Log</button>
+                <button onclick="switchTab('settings')" class="nav-tab" id="tab-settings">⚙ Settings</button>
+            </div>
+
+            <!-- ── Overview Section ── -->
+            <div id="section-stats" class="admin-section">
+                <h2 class="section-title-sm">Website Overview</h2>
+                <div class="data-grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="data-card">
+                        <h4>📍 Destination Summary</h4>
+                        <p id="overview-official">Official Places: <strong>–</strong></p>
+                        <p id="overview-community">Community Approved: <strong>–</strong></p>
+                        <p id="overview-categories">Categories: <strong>–</strong></p>
+                    </div>
+                    <div class="data-card">
+                        <h4>💬 Message Summary</h4>
+                        <p id="overview-total-msgs">Total Inquiries: <strong>–</strong></p>
+                        <p id="overview-unread-msgs">Unread: <strong style="color:#eab308;">–</strong></p>
+                        <p id="overview-pending-sub">Pending Submissions: <strong style="color:#f87171;">–</strong></p>
+                    </div>
+                </div>
+                <div class="data-card" style="margin-top:1.5rem;">
+                    <h4>🔐 Admin Session</h4>
+                    <p style="font-size:0.85rem; opacity:0.6;">You are logged in as <strong style="opacity:1;">Administrator</strong>. Session is active until browser closes.</p>
+                    <button onclick="adminLogout()" class="btn-sm btn-danger" style="margin-top:1rem;">Logout</button>
+                </div>
+            </div>
+
+            <!-- ── Live Places Section ── -->
+            <div id="section-active" class="admin-section" style="display: none;">
+                <h2 class="section-title-sm">Live Destinations</h2>
+                <div class="action-bar">
+                    <input type="text" id="search-active" placeholder="🔍 Search live places..." oninput="filterActivePlaces()" class="admin-form-input" style="flex:1; min-width:200px;">
+                </div>
+                <div id="approved-grid" class="data-grid" style="margin-bottom: 5rem;"></div>
+            </div>
+
+            <!-- ── Pending Section ── -->
+            <div id="section-pending" class="admin-section" style="display: none;">
+                <h2 class="section-title-sm">Pending Moderation</h2>
+                <div id="pending-grid" class="data-grid" style="margin-bottom: 5rem;"></div>
+            </div>
+
+            <!-- ── Messages Section ── -->
+            <div id="section-messages" class="admin-section" style="display: none;">
+                <h2 class="section-title-sm">User Inquiries</h2>
+                <div class="action-bar">
+                    <button onclick="markAllRead()" class="btn-sm btn-log">✔ Mark All Read</button>
+                    <button onclick="deleteReadMessages()" class="btn-sm btn-danger">🗑 Clear Read Messages Only</button>
+                </div>
+                <div id="inquiries-grid" style="margin-bottom: 5rem;"></div>
+            </div>
+
+            <!-- ── Add Place Section ── -->
+            <div id="section-add" class="admin-section" style="display: none;">
+                <div id="add-form-container" style="margin-bottom: 5rem;">
+                    <div class="data-card" style="border: 1px solid var(--primary);">
+                        <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--primary);">Add New Official Destination</h3>
+                        <form id="admin-add-place" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <input type="text" id="adm-title" placeholder="Place Title" required class="admin-form-input" style="grid-column: span 2;">
+                            <select id="adm-category" required class="admin-form-input">
+                                <option value="">Select Category</option>
+                                <option value="Resort">Resort</option>
+                                <option value="Beach">Beach</option>
+                                <option value="Hiking">Hiking</option>
+                                <option value="Heritage">Heritage</option>
+                            </select>
+                            <input type="text" id="adm-tags" placeholder="Tags (e.g. White Sand, Nature)" class="admin-form-input">
+                            <input type="text" id="adm-phone" placeholder="Phone Number (e.g. +63...)" class="admin-form-input">
+                            <input type="email" id="adm-email" placeholder="Gmail Address" class="admin-form-input">
+                            <input type="text" id="adm-essentials" placeholder="Travel Essentials (comma separated)" class="admin-form-input" style="grid-column: span 2;">
+                            <input type="text" id="adm-bestTime" placeholder="Best Time to Visit (e.g. Summer, Morning)" class="admin-form-input" style="grid-column: span 2;">
+                            <textarea id="adm-description" placeholder="Short Overview/Excerpt" rows="3" required class="admin-form-input" style="grid-column: span 2; resize: none;"></textarea>
+                            <textarea id="adm-history" placeholder="Full History / Detailed Description" rows="4" class="admin-form-input" style="grid-column: span 2; resize: none;"></textarea>
+                            <div style="grid-column: span 2;">
+                                <label style="font-size: 0.8rem; opacity: 0.6; display: block; margin-bottom: 5px;">Upload Image</label>
+                                <input type="file" id="adm-image" accept="image/*" required style="width: 100%; color: var(--text-main);">
+                                <div id="adm-image-preview" style="margin-top:10px; display:none;"><img id="adm-preview-img" style="max-height:140px; border-radius:8px; border:1px solid var(--glass-border);"></div>
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <label style="font-size: 0.8rem; opacity: 0.6; display: block; margin-bottom: 5px;">Set Location (Click Map to Drop Flag)</label>
+                                <div id="add-picker-map" class="picker-map"></div>
+                                <input type="hidden" id="adm-lat" value="10.15">
+                                <input type="hidden" id="adm-lng" value="124.15">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="grid-column: span 2;">Add Directly to Website</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Activity Log Section ── -->
+            <div id="section-log" class="admin-section" style="display: none;">
+                <h2 class="section-title-sm">Activity Log</h2>
+                <div class="action-bar">
+                    <button onclick="clearLog()" class="btn-sm btn-danger">🗑 Clear Log</button>
+                </div>
+                <div class="data-card">
+                    <div id="log-list" class="log-list"></div>
+                </div>
+            </div>
+
+            <!-- ── Settings Section ── -->
+            <div id="section-settings" class="admin-section" style="display: none;">
+                <h2 class="section-title-sm">System Settings & Health</h2>
+                <div class="data-grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="settings-section data-card">
+                        <h4>🔒 Security & Access</h4>
+                        <p style="font-size:0.82rem; opacity:0.55; margin-bottom:1.5rem;">Change your session password to secure the dashboard.</p>
+                        <input type="password" id="settings-old-pass" placeholder="Current Password" class="admin-form-input" style="width:100%; box-sizing:border-box; margin-bottom:1rem;">
+                        <input type="password" id="settings-new-pass" placeholder="New Password" class="admin-form-input" style="width:100%; box-sizing:border-box; margin-bottom:1rem;">
+                        <input type="password" id="settings-confirm-pass" placeholder="Confirm New Password" class="admin-form-input" style="width:100%; box-sizing:border-box; margin-bottom:1rem;">
+                        <button onclick="changePassword()" class="btn btn-primary" style="width:100%;">Update Password</button>
+                        <p id="settings-msg" class="settings-msg"></p>
+                    </div>
+
+                    <div class="settings-section data-card">
+                        <h4>💾 System Health & Storage</h4>
+                        <p style="font-size:0.82rem; opacity:0.55; margin-bottom:1.5rem;">Monitor your browser's local storage to prevent image upload errors.</p>
+                        <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--glass-border);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                                <span style="font-size: 0.95rem; font-weight: 600;">Storage Quota Used</span>
+                                <span id="storage-usage-text" style="font-size: 0.95rem; color: var(--primary); font-weight: 800;">Calculating...</span>
+                            </div>
+                            <div style="width: 100%; background: rgba(255,255,255,0.1); border-radius: 6px; height: 12px; overflow: hidden; margin-bottom: 1rem;">
+                                <div id="storage-progress" style="width: 0%; height: 100%; background: var(--primary); transition: width 0.5s ease;"></div>
+                            </div>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                                Note: Browsers typically limit local storage to ~5MB. If it reaches 100%, you won't be able to add new places. The system automatically compresses new images to help save space.
+                            </p>
+                        </div>
+                        <button onclick="calculateStorage()" class="btn-sm btn-export" style="width:100%; padding: 1rem;">Refresh Status</button>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /admin-container -->
+    </div><!-- /admin-content -->
+
+    <!-- ── Edit Place Modal ── -->
+    <div id="edit-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="data-card" style="width: 90%; max-width: 620px; max-height: 90vh; overflow-y: auto;">
+            <h3 style="color: var(--primary); margin-bottom: 1.5rem;">Edit Destination</h3>
+            <form id="edit-place-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <input type="hidden" id="edit-id">
+                <input type="text" id="edit-title" placeholder="Title" required class="admin-form-input" style="grid-column: span 2;">
+                <select id="edit-category" required class="admin-form-input">
+                    <option value="Resort">Resort</option>
+                    <option value="Beach">Beach</option>
+                    <option value="Hiking">Hiking</option>
+                    <option value="Heritage">Heritage</option>
+                </select>
+                <input type="text" id="edit-phone" placeholder="Phone Number" class="admin-form-input">
+                <input type="email" id="edit-email" placeholder="Gmail Address" class="admin-form-input" style="grid-column: span 2;">
+                <input type="text" id="edit-essentials" placeholder="Travel Essentials (comma separated)" class="admin-form-input" style="grid-column: span 2;">
+                <input type="text" id="edit-bestTime" placeholder="Best Time to Visit" class="admin-form-input" style="grid-column: span 2;">
+                <textarea id="edit-description" placeholder="Short Overview" rows="3" required class="admin-form-input" style="grid-column: span 2; resize: none;"></textarea>
+                <textarea id="edit-history" placeholder="Full History" rows="5" class="admin-form-input" style="grid-column: span 2; resize: none;"></textarea>
+                <div style="grid-column: span 2;">
+                    <label style="font-size: 0.8rem; opacity: 0.6; display: block; margin-bottom: 5px;">Change Image (Optional)</label>
+                    <input type="file" id="edit-image" accept="image/*" style="width: 100%; color: var(--text-main);">
+                </div>
+                <div style="grid-column: span 2;">
+                    <label style="font-size: 0.8rem; opacity: 0.6; display: block; margin-bottom: 5px;">Update Location (Click Map to Move Flag)</label>
+                    <div id="edit-picker-map" class="picker-map"></div>
+                    <input type="hidden" id="edit-lat">
+                    <input type="hidden" id="edit-lng">
+                </div>
+                <div style="grid-column: span 2; display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+                    <button type="button" onclick="closeEditModal()" class="btn btn-outline" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

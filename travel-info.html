@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Travel Info | Beautiful Getafe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav id="main-nav">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Beautiful<span>Getafe</span></a>
+            <div id="live-clock" class="live-clock">--:--:--</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="destinations.html">Destinations</a></li>
+                <li><a href="map.html">Map</a></li>
+                <li><a href="travel-info.html" style="color: var(--accent);">Travel Info</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="nav-spacer"></div>
+
+    <main>
+        <section id="info" class="info-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Travel <span>Essentials</span></h2>
+                    <p class="section-subtitle">Real-time alerts and local data to ensure your adventure to the Danajon Bank is safe and perfectly timed.</p>
+                </div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <h3>Current Conditions</h3>
+                            <div class="badge-live">Live Getafe</div>
+                        </div>
+                        <div id="weather-widget" class="weather-grid-pro">
+                            <!-- JS Dynamic Weather -->
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <h3>Tide & Safety</h3>
+                        <div id="tide-widget" class="tide-monitor">
+                            <div class="tide-level">
+                                <span class="label">Current Tide</span>
+                                <span class="value">High Tide</span>
+                            </div>
+                            <div class="safety-alert">Safe for Island Hopping</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">Beautiful<span>Getafe</span></a>
+                    <p>Your ultimate tourist guide for family bonding, exploring resorts, beaches, and the hidden wonders of Getafe.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="destinations.html">Destinations</a></li>
+                        <li><a href="travel-info.html">Travel Info</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Getafe Bohol Tourism. GATEWAY TO THE DANAJON BANK.</p>
+                <div class="social-links">
+                    <a href="https://facebook.com/getafetourism" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="https://instagram.com/getafebohol" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://twitter.com/getafebohol" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="mailto:tourism@getafebohol.gov.ph" title="Email"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

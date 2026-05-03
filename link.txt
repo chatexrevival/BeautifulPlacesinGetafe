@@ -1,0 +1,2 @@
+http://localhost/websiteProject/index.html
+https://chatexrevival.github.io/GetafetouristSpot/index.html

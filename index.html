@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Beautiful Places in Getafe | Tourist Guide</title>
+    <meta name="description" content="Discover the most beautiful places in Getafe for family bonding. Find the nearest resorts, pristine beaches, and historical spots.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 💫 Splash Screen -->
+    <div id="splash-screen">
+        <div class="splash-logo">Beautiful<span>Getafe</span></div>
+        <div class="splash-tagline">Discover Bohol's Hidden Gems</div>
+        <div class="splash-loader"></div>
+    </div>
+
+    <!-- 🔝 Back to Top Button -->
+    <button id="back-to-top" title="Back to Top">&#8679;</button>
+
+    <nav id="main-nav">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Beautiful<span>Getafe</span></a>
+            <div id="live-clock" class="live-clock">--:--:--</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="destinations.html">Destinations</a></li>
+                <li><a href="map.html">Map</a></li>
+                <li><a href="travel-info.html">Travel Info</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <header id="hero" class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="reveal-boundary"><p class="hero-subtitle">Family Tourist Guide</p></div>
+            <div class="reveal-boundary"><h1 class="hero-title">Beautiful Places in <span>Getafe</span></h1></div>
+            <div class="reveal-boundary"><p class="hero-description">Find the perfect spot for family bonding. Explore the nearest resorts, pristine beaches, and rich historical sanctuaries in Getafe.</p></div>
+            <div class="hero-actions reveal" style="transition-delay: 0.8s;">
+                <a href="destinations.html" class="btn btn-primary">Start Exploring</a>
+                <a href="travel-info.html" class="btn btn-outline">Travel Info</a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="mouse"></div>
+        </div>
+    </header>
+
+    <main>
+        <!-- 📞 Emergency & Tourism Hotlines Section -->
+        <section class="section" style="padding: 4rem 0; background: var(--bg-soft);">
+            <div class="container">
+                <div class="section-header" style="margin-bottom: 2.5rem;">
+                    <h2 class="section-title" style="font-size: 2rem;">Emergency <span>Hotlines</span></h2>
+                    <p class="section-subtitle">Important local contacts to ensure your safety and convenience during your stay in Getafe.</p>
+                </div>
+                <div class="data-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                    <div class="data-card" style="text-align: center; border-left: 3px solid var(--primary); padding: 1rem 0.5rem;">
+                        <h4 style="color: var(--text-main); margin-bottom: 0.25rem; font-size: 0.95rem;">Getafe Police Station</h4>
+                        <p style="font-size: 1rem; font-weight: bold; color: var(--accent); margin-bottom: 0.25rem;">0998-598-6435</p>
+                        <p style="font-size: 0.75rem; opacity: 0.7;">PNP Station</p>
+                    </div>
+                    <div class="data-card" style="text-align: center; border-left: 3px solid var(--primary); padding: 1rem 0.5rem;">
+                        <h4 style="color: var(--text-main); margin-bottom: 0.25rem; font-size: 0.95rem;">Rural Health Unit</h4>
+                        <p style="font-size: 1rem; font-weight: bold; color: var(--accent); margin-bottom: 0.25rem;">(038) 514-0012</p>
+                        <p style="font-size: 0.75rem; opacity: 0.7;">Medical emergencies</p>
+                    </div>
+                    <div class="data-card" style="text-align: center; border-left: 3px solid var(--primary); padding: 1rem 0.5rem;">
+                        <h4 style="color: var(--text-main); margin-bottom: 0.25rem; font-size: 0.95rem;">Tourism Office</h4>
+                        <p style="font-size: 1rem; font-weight: bold; color: var(--accent); margin-bottom: 0.25rem;">0917-123-4567</p>
+                        <p style="font-size: 0.75rem; opacity: 0.7;">Tours & assist</p>
+                    </div>
+                    <div class="data-card" style="text-align: center; border-left: 3px solid var(--primary); padding: 1rem 0.5rem;">
+                        <h4 style="color: var(--text-main); margin-bottom: 0.25rem; font-size: 0.95rem;">Coast Guard</h4>
+                        <p style="font-size: 1rem; font-weight: bold; color: var(--accent); margin-bottom: 0.25rem;">0912-345-6789</p>
+                        <p style="font-size: 0.75rem; opacity: 0.7;">Port Safety</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="#" class="logo">Beautiful<span>Getafe</span></a>
+                    <p>Your ultimate tourist guide for family bonding, exploring resorts, beaches, and the hidden wonders of Getafe.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="destinations.html">Destinations</a></li>
+                        <li><a href="travel-info.html">Travel Tips</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Getafe Bohol Tourism. GATEWAY TO THE DANAJON BANK.</p>
+                <div class="social-links">
+                    <a href="https://facebook.com/getafetourism" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="https://instagram.com/getafebohol" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://twitter.com/getafebohol" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="mailto:tourism@getafebohol.gov.ph" title="Email"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <button id="back-to-top" class="back-to-top-btn" aria-label="Back to Top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 15l-6-6-6 6"></path></svg>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html>

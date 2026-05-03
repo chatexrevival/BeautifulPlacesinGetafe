@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Beautiful Places in Getafe | Tourist Guide</title>
+    <meta name="description" content="Discover the most beautiful places in Getafe for family bonding. Find the nearest resorts, pristine beaches, and historical spots.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav id="main-nav">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Beautiful<span>Getafe</span></a>
+            <div id="live-clock" class="live-clock">--:--:--</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="destinations.html" style="color: var(--accent);">Destinations</a></li>
+                <li><a href="map.html">Map</a></li>
+                <li><a href="travel-info.html">Travel Info</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="nav-spacer"></div>
+
+    <main>
+        <section id="places" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Explore <span>Destinations</span></h2>
+                    <p class="section-subtitle">A curated collection of resorts, hidden beaches, and historical spots perfect for your family. Find the nearest places to stay and play.</p>
+                </div>
+
+                <div class="discover-controls">
+                    <div class="filter-group">
+                        <div class="filter-container" id="category-filters">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="Resort">Resorts</button>
+                            <button class="filter-btn" data-filter="Beach">Beaches</button>
+                            <button class="filter-btn" data-filter="Hiking">Hiking</button>
+                            <button class="filter-btn" data-filter="Heritage">History & Heritage</button>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="search-editorial">
+                    <div style="position: relative; width: 100%;">
+                        <input type="text" id="place-search" placeholder="Search for a specific island, story, or sanctuary..." autocomplete="off">
+                        <div id="search-suggestions" class="search-suggestions-box"></div>
+                    </div>
+                </div>
+                
+                <div class="editorial-grid" id="places-grid">
+                    <!-- Dynamic Content with asymmetrical classes via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Place Modal -->
+        <div id="add-place-modal" class="modal">
+            <div class="modal-content" style="max-width: 600px; padding: 4rem;">
+                <button class="close-modal" id="close-add-modal">&times;</button>
+                <h3 style="font-size: 2.5rem; margin-bottom: 1.5rem; letter-spacing: -2px;">Promote Your <span>Discovery</span></h3>
+                <p style="margin-bottom: 3rem; color: var(--text-muted); line-height: 1.6;">Share a photo and description of a beautiful spot in Getafe to help others explore!</p>
+                
+                <form id="add-place-form" style="display: grid; gap: 2rem;">
+                    <input type="text" id="new-place-title" placeholder="Place Name" required style="padding: 1.2rem; border: 1px solid var(--primary); outline: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <select id="new-place-category" required style="padding: 1.2rem; border: 1px solid var(--primary); outline: none; background: white;">
+                            <option value="">Category</option>
+                            <option value="Resort">Resort / Stay</option>
+                            <option value="Beach">Island/Beach</option>
+                            <option value="Hiking">Hiking/Nature</option>
+                            <option value="Heritage">Heritage/Culture</option>
+                        </select>
+                        <input type="text" id="new-place-coords" placeholder="Lat, Lng (Optional)" style="padding: 1.2rem; border: 1px solid var(--primary); outline: none;">
+                    </div>
+                    <textarea id="new-place-description" placeholder="Why should people visit this place?" rows="4" required style="padding: 1.2rem; border: 1px solid var(--primary); outline: none; resize: none;"></textarea>
+                    <div style="background: white; padding: 2rem; border: 1px dashed var(--primary); text-align: center;">
+                        <input type="file" id="new-place-image" accept="image/*" style="display: none;">
+                        <label for="new-place-image" style="cursor: pointer; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Click to Upload Photo</label>
+                        <p id="file-name" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem; text-transform: uppercase;">No file chosen</p>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Share Discovery</button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <footer id="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="#" class="logo">Beautiful<span>Getafe</span></a>
+                    <p>Your ultimate tourist guide for family bonding, exploring resorts, beaches, and the hidden wonders of Getafe.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="#hero">Home</a></li>
+                        <li><a href="destinations.html">Destinations</a></li>
+                        <li><a href="#info">Travel Tips</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Getafe Bohol Tourism. GATEWAY TO THE DANAJON BANK.</p>
+                <div class="social-links">
+                    <a href="https://facebook.com/getafetourism" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="https://instagram.com/getafebohol" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://twitter.com/getafebohol" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="mailto:tourism@getafebohol.gov.ph" title="Email"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Place Details Modal/Overlay -->
+    <div id="place-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" id="close-place-modal">&times;</button>
+            <div class="modal-body" id="modal-body">
+                <!-- Dynamic Content -->
+            </div>
+        </div>
+    </div>
+
+    <button id="back-to-top" class="back-to-top-btn" aria-label="Back to Top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 15l-6-6-6 6"></path></svg>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Contact Us | Beautiful Getafe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav id="main-nav">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Beautiful<span>Getafe</span></a>
+            <div id="live-clock" class="live-clock">--:--:--</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="destinations.html">Destinations</a></li>
+                <li><a href="map.html">Map</a></li>
+                <li><a href="travel-info.html">Travel Info</a></li>
+                <li><a href="contact.html" style="color: var(--accent);">Contact</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="nav-spacer"></div>
+
+    <main>
+        <section id="contact" class="section">
+            <div class="container">
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <h2 class="section-title">Let's Talk <span>Adventure</span></h2>
+                        <p>Have questions about the Danajon Bank or planning a group tour? Our local experts are ready to help you craft the perfect itinerary.</p>
+                        <div class="contact-methods">
+                            <div class="contact-method">
+                                <div class="icon-box">📍</div>
+                                <div>
+                                    <h5>Location</h5>
+                                    <p>Municipal Tourism Office, Getafe, Bohol</p>
+                                </div>
+                            </div>
+                            <div class="contact-method">
+                                <div class="icon-box">📧</div>
+                                <div>
+                                    <h5>Email</h5>
+                                    <p>visit@getafebohol.gov.ph</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-form-container">
+                        <form id="inquiry-form" class="contact-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Full Name</label>
+                                    <input type="text" placeholder="e.g. John Doe" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Email Address</label>
+                                    <input type="email" placeholder="john@example.com" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Interest</label>
+                                <select required>
+                                    <option value="">Select your adventure...</option>
+                                    <option value="Island Hopping">Island Hopping</option>
+                                    <option value="Diving">Diving & Snorkeling</option>
+                                    <option value="Eco-Tour">Mangrove Eco-Tour</option>
+                                    <option value="Other">General Inquiry</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Message</label>
+                                <textarea placeholder="Tell us more about your travel plans..." rows="5" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Send Inquiry</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">Beautiful<span>Getafe</span></a>
+                    <p>Your ultimate tourist guide for family bonding, exploring resorts, beaches, and the hidden wonders of Getafe.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="destinations.html">Destinations</a></li>
+                        <li><a href="travel-info.html">Travel Info</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Getafe Bohol Tourism. GATEWAY TO THE DANAJON BANK.</p>
+                <div class="social-links">
+                    <a href="https://facebook.com/getafetourism" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="https://instagram.com/getafebohol" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://twitter.com/getafebohol" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="mailto:tourism@getafebohol.gov.ph" title="Email"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

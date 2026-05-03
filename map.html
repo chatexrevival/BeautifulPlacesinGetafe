@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Interactive Map | Beautiful Getafe</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-white);
+        }
+
+        #map {
+            height: calc(100vh - 140px);
+            width: 100%;
+            margin-top: 140px;
+        }
+
+        .map-controls {
+            position: fixed;
+            top: 160px;
+            left: 20px;
+            z-index: 1000;
+            background: var(--glass-bg);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: calc(100% - 40px);
+        }
+
+        @media (max-width: 768px) {
+            #map {
+                height: calc(100vh - 80px);
+                margin-top: 80px;
+            }
+            .map-controls {
+                top: 90px;
+                left: 10px;
+                padding: 10px;
+                gap: 5px;
+                max-height: 200px;
+                overflow-y: auto;
+            }
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
+        .filter-btn {
+            background: var(--bg-soft);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: var(--primary);
+            color: #000;
+        }
+
+        .custom-map-label {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--primary);
+            color: white;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: 'Outfit';
+            font-size: 0.75rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .custom-map-label::before {
+            border-top-color: var(--primary) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <nav id="main-nav" class="scrolled" style="background: var(--bg-white);">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Beautiful<span>Getafe</span></a>
+            <div id="live-clock" class="live-clock">--:--:--</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="destinations.html">Destinations</a></li>
+                <li><a href="map.html" style="color: var(--accent);">Map</a></li>
+                <li><a href="travel-info.html">Travel Info</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="map-controls">
+        <h4 style="margin-bottom: 5px; color: var(--text-main);">Filter Destinations</h4>
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="Resort">Resorts</button>
+        <button class="filter-btn" data-filter="Beach">Beaches</button>
+        <button class="filter-btn" data-filter="Hiking">Hiking</button>
+        <button class="filter-btn" data-filter="Heritage">Heritage</button>
+
+        <hr style="border: 0.5px solid var(--glass-border); margin: 10px 0;">
+        <button onclick="findNearMe()" class="filter-btn"
+            style="background: #3b82f6; color: white; display: flex; align-items: center; gap: 8px; justify-content: center;">
+            <i class="fas fa-location-arrow"></i> Find Near Me
+        </button>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Use 3D Satellite for "True Map" experience
+            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri'
+            });
+            const streets = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO' });
+
+            const map = L.map('map', { center: [10.16, 124.13], zoom: 12, layers: [satellite] });
+
+            L.control.layers({
+                "Satellite 3D": satellite,
+                "Street View": streets
+            }).addTo(map);
+
+            let markers = [];
+            let userMarker = null;
+
+            function updateMap(filter, userCoords = null) {
+                markers.forEach(m => map.removeLayer(m.marker));
+                markers = [];
+
+                const placesToShow = allPlaces.filter(place => filter === 'all' || place.category === filter);
+
+                placesToShow.forEach(place => {
+                    if (place.coords) {
+                        let distanceHtml = "";
+                        if (userCoords) {
+                            const dist = map.distance(userCoords, place.coords);
+                            const distStr = dist < 1000 ? `${Math.round(dist)}m` : `${(dist / 1000).toFixed(1)}km`;
+                            distanceHtml = `<div style="color: #3b82f6; font-weight: 700; margin-top: 5px;"><i class="fas fa-walking"></i> ${distStr} from you</div>`;
+                        }
+
+                        const marker = L.marker(place.coords).addTo(map);
+
+                        // Add Permanent Floating Label
+                        marker.bindTooltip(`<b>${place.title}</b><br><span style="font-size:0.7rem; opacity:0.7;">${place.category}</span>`, {
+                            permanent: true,
+                            direction: 'top',
+                            className: 'custom-map-label',
+                            offset: [0, -10]
+                        });
+
+                        marker.bindPopup(`
+                            <div style="font-family: 'Outfit', sans-serif; padding: 10px; min-width: 150px; color: black;">
+                                <h4 style="margin: 0 0 5px 0; font-weight: 700; color: #b8860b;">${place.title}</h4>
+                                <p style="font-size: 0.8rem; margin: 0; color: #666;">${place.category}</p>
+                                ${distanceHtml}
+                                <hr style="margin: 10px 0; border: 0.5px solid #eee;">
+                                <a href="destinations.html" style="background: #d4af37; color: black; text-decoration: none; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; display: block; text-align: center; font-weight: 600;">View Details</a>
+                            </div>
+                        `);
+                        markers.push({ marker, place });
+                    }
+                });
+            }
+
+            window.findNearMe = () => {
+                if (!navigator.geolocation) return alert('Geolocation is not supported by your browser.');
+
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    const { latitude, longitude } = pos.coords;
+                    const userCoords = [latitude, longitude];
+
+                    if (userMarker) map.removeLayer(userMarker);
+
+                    userMarker = L.circleMarker(userCoords, {
+                        radius: 8,
+                        fillColor: '#3b82f6',
+                        color: '#fff',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).addTo(map).bindPopup("<b>You are here</b>").openPopup();
+
+                    map.setView(userCoords, 15);
+
+                    // Update all markers with distance
+                    const currentFilter = document.querySelector('.filter-btn.active').dataset.filter;
+                    updateMap(currentFilter, userCoords);
+
+                    // Find nearest
+                    let closest = null;
+                    let minDistance = Infinity;
+
+                    markers.forEach(m => {
+                        const dist = map.distance(userCoords, m.place.coords);
+                        if (dist < minDistance) {
+                            minDistance = dist;
+                            closest = m;
+                        }
+                    });
+
+                    if (closest) {
+                        setTimeout(() => {
+                            closest.marker.openPopup();
+                        }, 500);
+                    }
+                }, () => {
+                    alert('Could not get your location. Please check your browser permissions.');
+                });
+            };
+
+            updateMap('all');
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (e.target.dataset.filter) {
+                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        updateMap(e.target.dataset.filter);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
